@@ -37,6 +37,10 @@ namespace Conversor.Api.Presentation.Controllers
             {
                 return BadRequest(request);
             }
+            var response = await currencyService.Convert(request);
+            if (response.Success)
+                return Ok(response);
+            return NotFound(response);
 
         }
        
