@@ -17,7 +17,7 @@ namespace Conversor.Api.Domain.Tests
                 CurrencyIdentifier = new CurrencyIdentifier
                 {
                     Code = "CODE",
-                    Country = "COUNTRY"
+                    Name = "COUNTRY"
                 }
             };
 
@@ -34,7 +34,7 @@ namespace Conversor.Api.Domain.Tests
                     CurrencyIdentifier = new CurrencyIdentifier
                     {
                         Code = "",
-                        Country = "COUNTRY"
+                        Name = "COUNTRY"
                     }
                 };
             });
@@ -49,7 +49,7 @@ namespace Conversor.Api.Domain.Tests
                     CurrencyIdentifier = new CurrencyIdentifier
                     {
                         Code = "asas",
-                        Country = null
+                        Name = null
                     }
                 };
             });
@@ -64,7 +64,7 @@ namespace Conversor.Api.Domain.Tests
                     CurrencyIdentifier = new CurrencyIdentifier
                     {
                         Code = null,
-                        Country = null
+                        Name = null
                     }
                 };
             });
@@ -84,7 +84,7 @@ namespace Conversor.Api.Domain.Tests
                 var currency = new Currency(new CurrencyIdentifier {
 
                     Code = "CODE",
-                    Country = "COUNTRY"
+                    Name = "COUNTRY"
                 }, -1);
             });
         }
@@ -96,13 +96,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 1);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 1);
 
             var result = currency.ConverterToOtherCurrency(other, 1);
@@ -115,13 +115,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 1);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 1);
 
             var result = currency.ConverterToOtherCurrency(other);
@@ -134,13 +134,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 1);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 1);
 
             Assert.ThrowsException<ArgumentException>(() => {
@@ -155,13 +155,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 1);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 10);
 
             var result = currency.ConverterToOtherCurrency(other, 100);
@@ -175,13 +175,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 10);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 1);
 
             var result = currency.ConverterToOtherCurrency(other, 100);
@@ -195,13 +195,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 2);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 3);
 
             var result = currency.ConverterToOtherCurrency(other, 200);
@@ -214,13 +214,13 @@ namespace Conversor.Api.Domain.Tests
             var currency = new Currency(new CurrencyIdentifier
             {
                 Code = "CODE",
-                Country = "BRZ"
+                Name = "BRZ"
             }, 2);
 
             var other = new Currency(new CurrencyIdentifier
             {
                 Code = "OtCODE",
-                Country = "OtBRZ"
+                Name = "OtBRZ"
             }, 3);
 
             var result = currency.ConverterToOtherCurrency(other);

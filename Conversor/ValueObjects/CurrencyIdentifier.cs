@@ -20,7 +20,7 @@ namespace Conversor.Api.Domain.ValueObjects
         }
 
         private string _country;
-        public string Country
+        public string Name
         {
             get => _country;
             set
