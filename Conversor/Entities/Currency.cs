@@ -7,22 +7,54 @@ namespace Conversor.Api.Domain.Entities
 {
     public class Currency
     {
-        private CurrencyIdentifier _identifier;
-        public CurrencyIdentifier Identifier
+        public Currency()
         {
-            get => _identifier;
+
+        }
+
+        public Currency(CurrencyIdentifier currencyIdentifier, double dollarValue)
+        {
+            CurrencyIdentifier = currencyIdentifier;
+            DollarValue = dollarValue;
+        }
+
+        private CurrencyIdentifier _currencyIdentifier;
+        public CurrencyIdentifier CurrencyIdentifier
+        {
+            get => _currencyIdentifier;
             set
             {
-                _identifier = value ?? throw new ArgumentNullException("Currency indentifier cannot be null");
+                _currencyIdentifier = value ?? throw new ArgumentNullException("Currency indentifier cannot be null");
             }
         }
 
-
-        public double DollarValue { get; set; }
-
-        public double? ConverterToOtherCurrency(Currency other, double? amount)
+        private double _dollarValue;
+        public double DollarValue
         {
-            return null;
+            get => _dollarValue;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Dollar value cannot be negative or zero");
+                _dollarValue = value;
+            }
+        }
+
+        public double ConverterToOtherCurrency(Currency other, double? amount = null)
+        {
+            double newAmount = amount ?? 1;
+
+            double amountInDollar = TransformAmountInDollar(newAmount);
+            return other.DollarValue * amountInDollar;
+
+        }
+
+        private double TransformAmountInDollar(double amount)
+        {
+            if (amount < 0)
+                throw new ArgumentException("amount caanot be negative or zero");
+       
+            return amount / DollarValue;
         }
     }
 }
