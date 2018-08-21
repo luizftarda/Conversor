@@ -24,6 +24,34 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
             this.configuration = new CurrencyLayerConfiguration();
         }
 
+        public async Task<ConvertResponse> Convert(ConvertRequest request)
+        {
+            FindCurrencyRequest requestFrom = new FindCurrencyRequest
+            {
+                Currency = request.From
+            };
+            FindCurrencyRequest requestTo = new FindCurrencyRequest
+            {
+                Currency = request.To
+            };
+
+            var responseFrom = await FindCurrency(requestFrom);
+            var responseTo = await FindCurrency(requestTo);
+
+            var convertedAmount = responseFrom.Currency.ConverterToOtherCurrency(responseTo.Currency, request.Amount);
+
+            return new ConvertResponse
+            {
+                Success = responseFrom.Success && responseTo.Success,
+                Amount = request.Amount,
+                From = responseFrom.Currency,
+                To = responseTo.Currency,
+                Value = convertedAmount,
+                
+            };
+
+        }
+
         public Task<FindCurrencyResponse> FindCurrency(FindCurrencyRequest request)
         {
 
@@ -57,7 +85,7 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
                 return new ListCurrencyIdentifierResponse
                 {
                     Success = false,
-                    Error = new ListCurrencyIdentifierError
+                    Error = new Error
                     {
                         Type = "Unspected",
                         Message = e.Message
@@ -81,7 +109,7 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
             return new ListCurrencyIdentifierResponse
             {
                 Success = body.Success,
-                Error = body.Error == null ? null : new ListCurrencyIdentifierError
+                Error = body.Error == null ? null : new Error
                 {
                     Type = body.Error.Type,
                     Message = body.Error.Info

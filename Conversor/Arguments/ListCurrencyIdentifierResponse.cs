@@ -11,13 +11,6 @@ namespace Conversor.Api.Domain.Arguments
 
         public IEnumerable<CurrencyIdentifier> CurrencyIdentifiers { get; set; }
 
-        public ListCurrencyIdentifierError Error { get; set; }
-    }
-
-    public class ListCurrencyIdentifierError
-    {
-        public string Type { get; set; }
-
-        public string Message { get; set; }
+        public Error Error { get; set; }
     }
 }
