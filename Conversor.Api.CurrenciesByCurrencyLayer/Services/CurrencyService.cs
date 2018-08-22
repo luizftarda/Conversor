@@ -25,6 +25,94 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
         {
             this.configuration = new CurrencyLayerConfiguration();
         }
+        
+        public async Task<ListCurrencyIdentifierResponse> ListAllCurrencyIdentifier()
+        {
+            try
+            {
+                var client = CreateHttpClient();
+
+                var query = HttpUtility.ParseQueryString(string.Empty);
+                query["access_key"] = configuration.AccessKey;
+                var queryString = query.ToString();
+                
+                var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"list?{queryString}");
+
+                var response = await client.SendAsync(httpRequest);
+
+                var body = await GetBodyContent<CurrencyLayerListCurrencyResponse>(response);
+
+                return new ListCurrencyIdentifierResponse
+                {
+                    Success = body.Success,
+                    Error = body.Error == null ? null : new Error
+                    {
+                        Type = body.Error.Type,
+                        Message = body.Error.Info
+                    },
+                    CurrencyIdentifiers = body.Currencies?.Select(e => new CurrencyIdentifier
+                    {
+                        Code = e.Key,
+                        Name = e.Value
+                    }),
+                };
+            }
+            catch (Exception e)
+            {
+                return new ListCurrencyIdentifierResponse
+                {
+                    Success = false,
+                    Error = new Error
+                    {
+                        Type = "Unspected",
+                        Message = e.Message
+                    },
+                };
+            }
+        }
+
+        public async Task<FindCurrencyResponse> FindCurrency(FindCurrencyRequest request)
+        {
+            try
+            {
+                var client = CreateHttpClient();
+
+                var query = HttpUtility.ParseQueryString(string.Empty);
+                query["access_key"] = configuration.AccessKey;
+                query["currencies"] = string.Join(@",", request.Currencies.Select(c => c.Code));
+                var queryString = query.ToString();
+                
+                var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"live?{queryString}");
+
+                var response = await client.SendAsync(httpRequest);
+
+                var body = await GetBodyContent<CurrencyLayerLiveCurrencyResponse>(response);
+
+                return new FindCurrencyResponse
+                {
+                    Success = body.Success,
+                    Currencies = body.Error != null ? null :
+                        body.Quotes.Select(q => CreateCurrencyByQuoteAndIdentifiers(q, request.Currencies)).ToArray(),
+                    Error = body.Error == null ? null : new Error
+                    {
+                        Type = body.Error.Type,
+                        Message = body.Error.Info
+                    },
+                };
+            }
+            catch (Exception e)
+            {
+                return new FindCurrencyResponse
+                {
+                    Success = false,
+                    Error = new Error
+                    {
+                        Type = "Unspected",
+                        Message = e.Message
+                    },
+                };
+            }
+        }
 
         public async Task<ConvertResponse> Convert(ConvertRequest request)
         {
@@ -72,114 +160,9 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
                     }
                 };
             }
-           
-            
         }
-
-        public async Task<FindCurrencyResponse> FindCurrency(FindCurrencyRequest request)
-        {
-            try
-            {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.BaseAddress = new Uri("http://apilayer.net/api/");
-
-                var query = HttpUtility.ParseQueryString(string.Empty);
-                query["access_key"] = configuration.AccessKey;
-                query["currencies"] = string.Join(@",", request.Currencies.Select(c => c.Code));
-
-                string queryString = query.ToString();
-
-                var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"live?{queryString}");
-
-                var response = await client.SendAsync(httpRequest);
-
-                var body = await GetBodyContent<CurrencyLayerLiveCurrencyResponse>(response);
-
-                return new FindCurrencyResponse
-                {
-                    Success = body.Success,
-                    Currencies = body.Error != null ? null : 
-                        body.Quotes.Select(q => CreateCurrencyByQuoteAndIdentifiers(q, request.Currencies)).ToArray(),
-                    Error = body.Error == null ? null : new Error
-                    {
-                        Type = body.Error.Type,
-                        Message = body.Error.Info
-                    },
-                };
-            }
-            catch (Exception e)
-            {
-                return new FindCurrencyResponse
-                {
-                    Success = false,
-                    Error = new Error
-                    {
-                        Type = "Unspected",
-                        Message = e.Message
-                    },
-                };
-            }
-            
-            
-
-        }
-
-        private Currency CreateCurrencyByQuoteAndIdentifiers(KeyValuePair<string, string> quote, CurrencyIdentifier[] currencies)
-        {
-            var currentIdentifier = currencies.FirstOrDefault(c => quote.Key.EndsWith(c.Code));
-            double dollarValue = double.Parse(quote.Value, NumberFormatInfo.InvariantInfo);
-            return new Currency(currentIdentifier, dollarValue);
-        }
-
-        public async Task<ListCurrencyIdentifierResponse> ListAllCurrencyIdentifier()
-        {
-            try
-            {
-                HttpClient client = CreateHttpClient();
-
-                var query = HttpUtility.ParseQueryString(string.Empty);
-                query["access_key"] = configuration.AccessKey;
-
-                string queryString = query.ToString();
-
-                var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"list?{queryString}");
-
-                var response = await client.SendAsync(httpRequest);
-
-                var body = await GetBodyContent<CurrencyLayerListCurrencyResponse>(response);
-
-                return new ListCurrencyIdentifierResponse
-                {
-                    Success = body.Success,
-                    Error = body.Error == null ? null : new Error
-                    {
-                        Type = body.Error.Type,
-                        Message = body.Error.Info
-                    },
-                    CurrencyIdentifiers = body.Currencies?.Select(e => new CurrencyIdentifier
-                    {
-                        Code = e.Key,
-                        Name = e.Value
-                    }),
-                };
-            }
-            catch (Exception e)
-            {
-                return new ListCurrencyIdentifierResponse
-                {
-                    Success = false,
-                    Error = new Error
-                    {
-                        Type = "Unspected",
-                        Message = e.Message
-                    },
-                };
-            }
-        }
-
-        private static HttpClient CreateHttpClient()
+        
+        private HttpClient CreateHttpClient()
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
@@ -187,7 +170,7 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
             client.BaseAddress = new Uri("http://apilayer.net/api/");
             return client;
         }
-
+        
         private async Task<T> GetBodyContent<T>(HttpResponseMessage response)
         {
             var serializer = new DataContractJsonSerializer(typeof(T),
@@ -199,8 +182,13 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
             var encoding = Encoding.UTF8;
             var stream = await response.Content.ReadAsStreamAsync();
             return (T)serializer.ReadObject(stream);
+        }
 
-            
+        private Currency CreateCurrencyByQuoteAndIdentifiers(KeyValuePair<string, string> quote, CurrencyIdentifier[] currencies)
+        {
+            var currentIdentifier = currencies.FirstOrDefault(c => quote.Key.EndsWith(c.Code));
+            var dollarValue = double.Parse(quote.Value, NumberFormatInfo.InvariantInfo);
+            return new Currency(currentIdentifier, dollarValue);
         }
     }
 }
