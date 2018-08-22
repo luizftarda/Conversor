@@ -28,6 +28,7 @@ namespace Conversor.Api.Presentation
             Injector.Inject((t1, t2) => {
                 services.AddTransient(t1,t2);
             });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
