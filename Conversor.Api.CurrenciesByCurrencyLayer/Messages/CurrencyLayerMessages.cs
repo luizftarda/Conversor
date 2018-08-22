@@ -19,6 +19,19 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Messages
     }
 
     [DataContract]
+    public class CurrencyLayerLiveCurrencyResponse
+    {
+        [DataMember(Name = "success")]
+        public bool Success { get; set; }
+
+        [DataMember(Name = "quotes")]
+        public Dictionary<string, string> Quotes { get; set; }
+
+        [DataMember(Name = "error")]
+        public CurrencyLayerError Error { get; set; }
+    }
+
+    [DataContract]
     public class CurrencyLayerError
     {
         [DataMember(Name = "code")]

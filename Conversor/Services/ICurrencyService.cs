@@ -12,6 +12,6 @@ namespace Conversor.Api.Domain.Services
 
         Task<FindCurrencyResponse> FindCurrency(FindCurrencyRequest request);
 
-        Task<ConvertResponse> Convert(ConvertRequest request)
+        Task<ConvertResponse> Convert(ConvertRequest request);
     }
 }

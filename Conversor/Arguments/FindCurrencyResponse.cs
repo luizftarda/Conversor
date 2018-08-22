@@ -9,7 +9,7 @@ namespace Conversor.Api.Domain.Arguments
     {
         public bool Success { get; set; }
 
-        public Currency Currency { get; set; }
+        public Currency[] Currencies { get; set; }
 
         public Error Error { get; set; }
     }

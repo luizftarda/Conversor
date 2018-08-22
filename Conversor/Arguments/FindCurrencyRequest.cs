@@ -7,6 +7,6 @@ namespace Conversor.Api.Domain.Arguments
 {
     public class FindCurrencyRequest
     {
-        public CurrencyIdentifier Currency { get; set; }
+        public CurrencyIdentifier[] Currencies { get; set; }
     }
 }
