@@ -50,7 +50,7 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
                     {
                         Code = e.Key,
                         Name = e.Value
-                    }),
+                    }).ToList(),
                 };
             }
             catch (Exception e)

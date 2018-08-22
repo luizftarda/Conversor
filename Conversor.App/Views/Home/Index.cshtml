@@ -1,0 +1,32 @@
+﻿@model Conversor.App.Models.RequestConvertViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Conversor de Moedas</h2>
+        <div class="form-group">
+            <form asp-action="Convert" method="post">
+
+                Montante: <input type="text" class="form-control" for="Amount" name="Amount"  value="@Model.Amount"/>
+                <select class="form-control" for="From" name="From" asp-items="@(new SelectList(ViewBag.ListCurrencyIdentifier1, "Code", "Name"))">
+                    <option>@Model.From</option>
+                </select>
+                
+                <br />
+
+                Convertido: <input class="form-control" type="text" for="Value" name="Value" value="@Model.Value"/>
+                            <select class="form-control" for="To" name="To" asp-items="@(new SelectList(ViewBag.ListCurrencyIdentifier2, "Code", "Name"))">
+                                <option>@Model.To</option>
+                            </select>
+         
+                <br /><br />
+                <button class="button col-md-12" type="submit">Cotar</button>
+               
+            </form>
+        </div>
+    </div>
+
+</div>
