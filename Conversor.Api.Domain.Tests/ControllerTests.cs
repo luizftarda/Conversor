@@ -1,46 +1,101 @@
-﻿//using Conversor.Api.CurrenciesByCurrencyLayer.Services;
-//using Conversor.Api.Domain.Arguments;
-//using Conversor.Api.Domain.Services;
-//using Conversor.Api.Domain.ValueObjects;
-//using Conversor.Api.Presentation.Controllers;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using Moq;
-//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Conversor.Api.CurrenciesByCurrencyLayer.Configuration;
+using Conversor.Api.CurrenciesByCurrencyLayer.Services;
+using Conversor.Api.Domain.Arguments;
+using Conversor.Api.Domain.Services;
+using Conversor.Api.Domain.ValueObjects;
+using Conversor.Api.Presentation.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace Conversor.Api.Domain.Tests
-//{
-//    [TestClass]
-//    public class ControllerTests
-//    {
-//        [TestMethod]
-//        public async void ConvertTestOk()
-//        {
+namespace Conversor.Api.Domain.Tests
+{
+    [TestClass]
+    public class ControllerTests
+    {
+        [TestMethod]
+        public void ConvertTestOk()
+        {
+            var currencies = new CurrencyIdentifier[]
+                {
+                    new CurrencyIdentifier
+                    {
+                        Code = "BRL",
+                        Name = "Brazilian Real"
+                    },
+                     new CurrencyIdentifier
+                    {
+                        Code = "EUR",
+                        Name = "Euro"
+                    }
+                };
+            
+            var service = new ConvertService(new CurrencyLayerConfiguration(),
+                new CurrencyService(new CurrencyLayerConfiguration()));
+            var result = service.Convert(new ConvertRequest
+            {
+                Amount = 1,
+                From = currencies[0],
+                To = currencies[1]
+            }).Result;
 
-//            var service = new CurrencyService();
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Success);
+        }
 
-//            var controller = new CurrencyController(service);
+        [TestMethod]
+        public void ConvertTestError()
+        {
+            var currencies = new CurrencyIdentifier[]
+                {
+                    new CurrencyIdentifier
+                    {
+                        Code = "BRL",
+                        Name = "Brazilian Real"
+                    },
+                     new CurrencyIdentifier
+                    {
+                        Code = "EUR",
+                        Name = "Euro"
+                    }
+                };
 
-//            var result = await controller.Post(new ConvertRequest
-//            {
-//                Amount = 10,
-//                From = new ValueObjects.CurrencyIdentifier
-//                {
-//                    Code = "BRL",
-//                    Name = "Brazilian Real"
-//                },
-//                To = new ValueObjects.CurrencyIdentifier
-//                {
-//                    Code = "EUR",
-//                    Name = "Euro"
-//                }
+            var service = new ConvertService(new CurrencyLayerConfiguration(),
+                new CurrencyService(new CurrencyLayerConfiguration()));
+            var result = service.Convert(new ConvertRequest
+            {
+                Amount = 1,
+                From = currencies[0]
+            }).Result;
 
-//            });
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result.Success);
+        }
 
-//        }
+        [TestMethod]
+        public void ListOk()
+        {
+            
+            var service = new CurrencyIdentifierService(new CurrencyLayerConfiguration());
+            var result = service.ListAllCurrencyIdentifier().Result;
 
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Success);
+        }
 
-//    }
-//}
+        [TestMethod]
+        public void ListError()
+        {
+
+            var service = new CurrencyIdentifierService(new CurrencyLayerConfiguration() { AccessKey = "sdasdsad"});
+            var result = service.ListAllCurrencyIdentifier().Result;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result.Success);
+        }
+
+    }
+}

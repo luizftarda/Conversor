@@ -5,6 +5,6 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Configuration
     public interface IConfiguration
     {
         string AccessKey { get; set; }
-        string BaseUrl { get; }
+        string BaseUrl { get; set; }
     }
 }
