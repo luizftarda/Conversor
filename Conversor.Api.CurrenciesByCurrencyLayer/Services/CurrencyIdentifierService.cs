@@ -1,32 +1,28 @@
 ﻿using Conversor.Api.CurrenciesByCurrencyLayer.Configuration;
 using Conversor.Api.CurrenciesByCurrencyLayer.Messages;
 using Conversor.Api.Domain.Arguments;
-using Conversor.Api.Domain.Entities;
 using Conversor.Api.Domain.Services;
 using Conversor.Api.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
 namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
 {
-    public class CurrencyService : HttpBaseService, ICurrencyService
+    public class CurrencyIdentifierService : HttpBaseService, ICurrencyIdentifierService
     {
-        public CurrencyService(IConfiguration configuration)
+    
+        public CurrencyIdentifierService(IConfiguration configuration)
             :base(configuration)
         {
-
+    
         }
-        
-       
-        public async Task<FindCurrencyResponse> FindCurrency(FindCurrencyRequest request)
+
+        public async Task<ListCurrencyIdentifierResponse> ListAllCurrencyIdentifier()
         {
             try
             {
@@ -34,30 +30,32 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
 
                 var query = HttpUtility.ParseQueryString(string.Empty);
                 query["access_key"] = configuration.AccessKey;
-                query["currencies"] = string.Join(@",", request.Currencies.Select(c => c.Code));
                 var queryString = query.ToString();
-                
-                var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"live?{queryString}");
+
+                var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"list?{queryString}");
 
                 var response = await client.SendAsync(httpRequest);
 
-                var body = await GetBodyContent<CurrencyLayerLiveCurrencyResponse>(response);
+                var body = await GetBodyContent<CurrencyLayerListCurrencyResponse>(response);
 
-                return new FindCurrencyResponse
+                return new ListCurrencyIdentifierResponse
                 {
                     Success = body.Success,
-                    Currencies = body.Error != null ? null :
-                        body.Quotes.Select(q => CreateCurrencyByQuoteAndIdentifiers(q, request.Currencies)).ToArray(),
                     Error = body.Error == null ? null : new Error
                     {
                         Type = body.Error.Type,
                         Message = body.Error.Info
                     },
+                    CurrencyIdentifiers = body.Currencies?.Select(e => new CurrencyIdentifier
+                    {
+                        Code = e.Key,
+                        Name = e.Value
+                    }),
                 };
             }
             catch (Exception e)
             {
-                return new FindCurrencyResponse
+                return new ListCurrencyIdentifierResponse
                 {
                     Success = false,
                     Error = new Error
@@ -69,12 +67,5 @@ namespace Conversor.Api.CurrenciesByCurrencyLayer.Services
             }
         }
 
-       
-        private Currency CreateCurrencyByQuoteAndIdentifiers(KeyValuePair<string, string> quote, CurrencyIdentifier[] currencies)
-        {
-            var currentIdentifier = currencies.FirstOrDefault(c => quote.Key.EndsWith(c.Code));
-            var dollarValue = double.Parse(quote.Value, NumberFormatInfo.InvariantInfo);
-            return new Currency(currentIdentifier, dollarValue);
-        }
     }
 }

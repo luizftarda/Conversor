@@ -13,9 +13,9 @@ namespace Conversor.Api.Domain.Arguments
 
         public Currency To { get; set; }
 
-        public double Amount { get; set; }
+        public double? Amount { get; set; }
 
-        public double Value { get; set; }
+        public double? Value { get; set; }
 
         public Error Error { get; set; }
     }

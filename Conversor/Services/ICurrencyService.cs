@@ -8,10 +8,6 @@ namespace Conversor.Api.Domain.Services
 {
     public interface ICurrencyService
     {
-        Task<ListCurrencyIdentifierResponse> ListAllCurrencyIdentifier();
-
         Task<FindCurrencyResponse> FindCurrency(FindCurrencyRequest request);
-
-        Task<ConvertResponse> Convert(ConvertRequest request);
     }
 }

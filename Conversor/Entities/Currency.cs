@@ -45,7 +45,7 @@ namespace Conversor.Api.Domain.Entities
             double newAmount = amount ?? 1;
 
             double amountInDollar = TransformAmountInDollar(newAmount);
-            return other.DollarValue * amountInDollar;
+            return amountInDollar * other.DollarValue;
 
         }
 
