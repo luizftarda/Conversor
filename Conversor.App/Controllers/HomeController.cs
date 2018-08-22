@@ -37,7 +37,14 @@ namespace Conversor.App.Controllers
         {
             ViewBag.ListCurrencyIdentifier1 = Identifiers.ToList();
             ViewBag.ListCurrencyIdentifier2 = Identifiers.ToList();
-            
+            if (string.IsNullOrEmpty(model.From))
+            {
+                model.From = Identifiers.FirstOrDefault(x => x.Code == "BRL").Name;
+            }
+            if (string.IsNullOrEmpty(model.To))
+            {
+                model.To = Identifiers.FirstOrDefault(x => x.Code == "USD").Name;
+            }
             return View(model);
         }
 
@@ -63,15 +70,15 @@ namespace Conversor.App.Controllers
             var body = new ConvertRequest
             {
                 Amount = model.Amount,
-                From = Identifiers.FirstOrDefault(x => x.Code == model.From),
-                To = Identifiers.FirstOrDefault(x => x.Code == model.To)
+                From = from,
+                To = to
             };
             req.AddJsonBody(body);
            
             var res = client.Post<ConvertResponse>(req);
             model.Value = res.Data.Value.Value;
-            model.From = Identifiers.FirstOrDefault(x => x.Code == model.From).Name;
-            model.To = Identifiers.FirstOrDefault(x => x.Code == model.To).Name;
+            model.From = from.Name;
+            model.To = to.Name;
             ViewBag.ListCurrencyIdentifier1 = Identifiers.ToList();
             ViewBag.ListCurrencyIdentifier2 = Identifiers.ToList();
 
